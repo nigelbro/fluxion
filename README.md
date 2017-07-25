@@ -6,8 +6,8 @@ Library to simplfy integrating RxJava with the Flux Architecture in Android.
 This architecture system is designed to allow for linear data flow, immutability, control of traffic flow etc.
 
  * Eliminate creating custom Events or Actions for Eventbus.
- * Worry about creating Action methods and not observables and posting to the event bus extend ActionCreators with RxActionCreator and postAction().
- * No more eventbus subscribe methods throughout the application implement RxViewDispatch in Activities and BaseRxViewDispatch in Fragments, and Adapters.
+ * Worry about creating Action methods and not observables and posting to the event bus extend ActionCreators with FluxionActionCreator and postAction().
+ * No more eventbus subscribe methods throughout the application implement FluxionViewInterface in Activities and BaseFluxionViewInterface in Fragments, and Adapters.
  * Post store change.
 
 ```java
