@@ -232,8 +232,11 @@ This is a helper method for building the mapping postParams for a Ion request
 }
 
 ```
-License
--------
+## Bugs and Feedback
+
+For bugs, feature requests, and discussion please use [GitHub Issues][issues].
+
+##License
 
     Copyright 2017 Nigel Brown
 
