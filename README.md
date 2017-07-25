@@ -44,9 +44,21 @@ class ExampleActivity extends Activity implement FluxionViewInterface{
 
 Download
 --------
-Add as submodule to Android projects
-
-git submodule add git@bitbucket.org:Frontlinetech/reactiveflux.git
+Add it in your root build.gradle at the end of repositories:
+```gradle
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+Add the dependency:
+```gradle
+dependencies {
+	        compile 'com.github.nigelbro:fluxion:v1.0'
+	}
+```
 
 More examples
 -----------
