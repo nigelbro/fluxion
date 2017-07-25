@@ -236,7 +236,7 @@ This is a helper method for building the mapping postParams for a Ion request
 
 For bugs, feature requests, and discussion please use [GitHub Issues][issues].
 
-##License
+License
 
     Copyright 2017 Nigel Brown
 
@@ -256,3 +256,4 @@ For bugs, feature requests, and discussion please use [GitHub Issues][issues].
 
  [1]: http://square.github.com/dagger/
  [2]: https://github.com/koush/ion
+ [issues]: https://github.com/nigelbro/fluxion/issues
