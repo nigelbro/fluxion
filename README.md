@@ -1,6 +1,6 @@
 Fluxion
 ============
-![Fluxion](fluxion_diagram.png)
+
 
 Library to simplfy integrating RxJava with the Flux Architecture in Android.
 This architecture system is designed to allow for linear data flow, immutability, control of traffic flow etc.
@@ -46,18 +46,18 @@ Download
 --------
 Add it in your root build.gradle at the end of repositories:
 ```gradle
-	allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
 	}
+}
 ```
 Add the dependency:
 ```gradle
 dependencies {
-	        compile 'com.github.nigelbro:fluxion:v1.0'
-	}
+	compile 'com.github.nigelbro:fluxion:v1.0'
+}
 ```
 
 More examples
@@ -111,14 +111,14 @@ Creating Stores
 ```java
 //Emitting storeChange to Views once some work has been completed and or application state changed
 //This postChange() method will cause the dispatcher to call all Views registered to listen to store changes and call their onStoreChanged inherited method
-class AppStore extends RxStore implements AppStoreInterface{
+class AppStore extends RxStore implements AppStoreInterface {
 
-    public AppStore(RxDispatcher dispatcher){
+    public AppStore(RxDispatcher dispatcher) {
       super(dispatcher);
     }
 
     @Override
-    public void onFluxionAction(RxAction action){
+    public void onFluxionAction(RxAction action) {
       switch(action.getType){
         case {ActionInterface}.{ACTION}
           //do something
@@ -130,7 +130,7 @@ class AppStore extends RxStore implements AppStoreInterface{
 
 //Emitting storeChangeError Views to once some work has failed and or application state could not be changed
 //This postChangeError() method will cause the dispatcher to call all Views registered to listen to store changes and call their onStoreChangedError inherited method
-class AppStore extends FluxionStore implements AppStoreInterface{
+class AppStore extends FluxionStore implements AppStoreInterface {
 
     public AppStore(Dispatcher dispatcher){
       super(dispatcher);
@@ -157,38 +157,38 @@ An ApiStore Example
 ```java
 public class ApiStore extends FluxionStore implements ApiStoreInterface {
 
-	@Inject Ion mIon;
-	private Context mContext;
-  private List<Person> mUsers;
+@Inject Ion mIon;
+private Context mContext;
+private List<Person> mUsers;
 
-	@Inject
-	public ApiStore(Dispatcher dispatcher, App app) {
-		super(dispatcher);
-		app.getComponent().inject(this);
-		this.mContext = app;
-	}
+@Inject
+public ApiStore(Dispatcher dispatcher, App app) {
+	super(dispatcher);
+	app.getComponent().inject(this);
+	this.mContext = app;
+}
 
-	@Override
-	public void onFluxionAction(FluxionAction action) {
-		switch(action.getType()) {
-			case ApiActions.MAKE_SOME_NETWORK_REQUEST:
-				if(!internetAvailable){
-						postChangeError(new StoreChangeError(new NoInternetConnectionError(NO_INTERNET_MESSAGE)));
-				}else {
-					Observable.just(getUsers(action))
-					          .subscribeOn(Schedulers.io())
-					          .observeOn(AndroidSchedulers.mainThread())
-					          .subscribe(result -> {
-						          if(result == null || !result.isSuccess()){
-							          postChangeError(new StoreChangeError( NetworkRequestException("Message")));
-						          }else if(result.isSuccess()) {
+@Override
+public void onFluxionAction(FluxionAction action) {
+	switch(action.getType()) {
+		case ApiActions.MAKE_SOME_NETWORK_REQUEST:
+			if(!internetAvailable){
+				postChangeError(new StoreChangeError(new NoInternetConnectionError(NO_INTERNET_MESSAGE)));
+			}else {
+				Observable.just(getUsers(action))
+					  .subscribeOn(Schedulers.io())
+					  .observeOn(AndroidSchedulers.mainThread())
+					  .subscribe(result -> {
+						     if(result == null || !result.isSuccess()){
+							    postChangeError(new StoreChangeError( NetworkRequestException("Message")));
+						     }else if(result.isSuccess()) {
 							          mUsers = result; //Store state of request so list of users this is good if you make multiple requests and you can give add this as a time, value pair and if this state has been updated in say the last 5 mins use it instead of sending another action to the action creator to make this network call.
 							          postChange(new StoreChange(Constants.API_STORE_ID, action));
-						          }
-					});
-				}
+						     }});
+			}
 				break;
 	}
+}
 
 /**
 This method would be placed inside on the ApiStoreInterface.java
@@ -201,36 +201,24 @@ This method would be placed inside on the ApiStoreInterface.java
 /**
 This is clean and simplified way to use Ion as an Object and make Synchronous calls and parse objects as responses
 **/
-	private List<Person> getUsersRequest(final RxAction action) {
-		List<Person> users = new ArrayList();
-		try {
-				users = mIon.build(mContext).load(POST,BuildConfig.BACKEND + GET_USERS_ENDPOINT).setBodyParameters(createPostParams(new ApiAuth(action.get(Keys.USER_API_CRED)))).as(new TypeToken<List<Person>>() {}).get();
-		}catch(Exception ie){
-			Crashlytics.logException(ie);
-			ie.printStackTrace();
-		}
-		return users;
+private List<Person> getUsersRequest(final RxAction action) {
+	List<Person> users = new ArrayList();
+	try {
+		users = mIon.build(mContext).load(POST,BuildConfig.BACKEND + GET_USERS_ENDPOINT).setBodyParameters(createPostParams(new ApiAuth(action.get(Keys.USER_API_CRED)))).as(new TypeToken<List<Person>>() {}).get();
+	}catch(Exception ie){
+		ie.printStackTrace();
 	}
+		return users;
+}
 
 /**
 This is a helper method for building the mapping postParams for a Ion request
 **/
-	private Map<String, List<String>> createPostParams(ApiAuth credentials) {
-		Map<String, List<String>> params = new HashMap<>();
-    params.put(TOKEN, Arrays.asList(credentials.token));
-		return params;
-	}
-  /**
-  This is a helper method for building a JsonObject from an Object using JsonParser for a Ion request
-  **/
-	private JsonObject createJsonBody(Object object) {
-		Gson gson = new Gson();
-		PurchaseDataModel dataModel = (PurchaseDataModel)object;
-		String obj = gson.toJson(dataModel);
-		return (new JsonParser()).parse(obj).getAsJsonObject();
-	}
+private Map<String, List<String>> createPostParams(ApiAuth credentials) {
+	Map<String, List<String>> params = new HashMap<>();
+    	params.put(TOKEN, Arrays.asList(credentials.token));
+	return params;
 }
-
 ```
 ## Bugs and Feedback
 
