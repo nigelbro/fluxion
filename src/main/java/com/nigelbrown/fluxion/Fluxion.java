@@ -2,6 +2,7 @@ package com.nigelbrown.fluxion;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -76,6 +77,22 @@ public class Fluxion implements Application.ActivityLifecycleCallbacks {
 					if(f instanceof BaseFluxionViewInterface){
 						mDispatcher.unregister((BaseFluxionViewInterface) f);
 					}
+				}
+
+				@Override
+				public void onFragmentAttached(FragmentManager fm, Fragment f, Context context) {
+					super.onFragmentAttached(fm, f, context);
+					if(f instanceof BaseFluxionViewInterface){
+						mDispatcher.registerFluxionStore((BaseFluxionViewInterface) f);
+					}
+				}
+
+				@Override
+				public void onFragmentDetached(FragmentManager fm, Fragment f) {
+					if(f instanceof BaseFluxionViewInterface){
+						mDispatcher.unregister((BaseFluxionViewInterface) f);
+					}
+					super.onFragmentDetached(fm, f);
 				}
 			},true);
 
