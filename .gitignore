@@ -53,3 +53,6 @@ google-services.json
 freeline.py
 freeline/
 freeline_project_description.json
+.idea/vcs.xml
+.gradle/3.3/taskArtifacts/
+.idea/workspace.xml
