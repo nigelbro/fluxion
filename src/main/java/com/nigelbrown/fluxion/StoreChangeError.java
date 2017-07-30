@@ -6,7 +6,7 @@ package com.nigelbrown.fluxion;
 public class StoreChangeError {
 	private Throwable mThrowable;
 
-	private StoreChangeError(Throwable throwable) {
+	public StoreChangeError(Throwable throwable) {
 		this.mThrowable = throwable;
 	}
 
