@@ -5,12 +5,6 @@ package com.nigelbrown.fluxion;
  */
 public interface BaseFluxionViewInterface {
 	/**
-	 * Deprecated method
-	 */
-	@Deprecated
-	void onStoreChanged(StoreChange change);
-
-	/**
 	 * All the stores will call this method so the view can react and request the needed data
 	 */
 	void onReact(Reaction reaction);
