@@ -14,8 +14,25 @@ public abstract class FluxionStore implements FluxionActionInterface {
 		mDispatcher.registerFluxionAction(this);
 	}
 
-	protected void postChange(StoreChange change) {
-		mDispatcher.postFluxionStoreChange(change);
+	private Reaction newReaction(String reactionId,Object... data) {
+		if(reactionId.isEmpty()) {
+			throw new IllegalArgumentException("Type must not be empty");
+		}
+		if(data.length % 2 != 0) {
+			throw new IllegalArgumentException("Data must be a valid list of key,value pairs");
+		}
+		Reaction.Builder reactionBuilder = Reaction.type(reactionId);
+		int i = 0;
+		while(i < data.length) {
+			String key = (String)data[i++];
+			Object value = data[i++];
+			reactionBuilder.bundle(key, value);
+		}
+		return reactionBuilder.build();
+	}
+
+	protected void postReaction(String reactionId,Object... data) {
+		mDispatcher.postReaction( newReaction(reactionId, data));
 	}
 
 	protected void postChangeError(StoreChangeError change) {

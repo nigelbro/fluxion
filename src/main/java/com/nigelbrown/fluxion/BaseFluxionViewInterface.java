@@ -5,9 +5,15 @@ package com.nigelbrown.fluxion;
  */
 public interface BaseFluxionViewInterface {
 	/**
-	 * All the stores will call this event so the view can react and request the needed data
+	 * Deprecated method
 	 */
+	@Deprecated
 	void onStoreChanged(StoreChange change);
+
+	/**
+	 * All the stores will call this method so the view can react and request the needed data
+	 */
+	void onReact(Reaction reaction);
 	/**
 	 * All action creators will call this if they have to post an error with the emitting observable.
 	 */

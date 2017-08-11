@@ -63,12 +63,12 @@ public class Fluxion implements Application.ActivityLifecycleCallbacks {
 	@Override public void onActivityCreated(Activity activity, Bundle bundle) {
 		if (activity instanceof FluxionViewInterface) {
 			((FluxionViewInterface) activity).onRegisterStores();
-			mDispatcher.registerFluxionStore((FluxionViewInterface) activity);
+			mDispatcher.registerReaction((FluxionViewInterface) activity);
 			((AppCompatActivity)activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
 				@Override
 				public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
 					if(f instanceof BaseFluxionViewInterface){
-						mDispatcher.registerFluxionStore((BaseFluxionViewInterface) f);
+						mDispatcher.registerReaction((BaseFluxionViewInterface) f);
 					}
 				}
 
@@ -83,7 +83,7 @@ public class Fluxion implements Application.ActivityLifecycleCallbacks {
 				public void onFragmentAttached(FragmentManager fm, Fragment f, Context context) {
 					super.onFragmentAttached(fm, f, context);
 					if(f instanceof BaseFluxionViewInterface){
-						mDispatcher.registerFluxionStore((BaseFluxionViewInterface) f);
+						mDispatcher.registerReaction((BaseFluxionViewInterface) f);
 					}
 				}
 

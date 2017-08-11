@@ -44,19 +44,19 @@ public class FluxionDispatcher {
 		}
 	}
 
-	public <T extends BaseFluxionViewInterface> void registerFluxionStore(final T object) {
+	public <T extends BaseFluxionViewInterface> void registerReaction(final T object) {
 		final String tag = object.getClass().getSimpleName();
 		Subscription subscription = mFluxionStoreMap.get(tag);
 		if(subscription == null || subscription.isUnsubscribed()) {
 			mFluxionStoreMap.put(tag, mBus.get().filter(new Func1<Object, Boolean>() {
 				@Override
 				public Boolean call(Object o) {
-					return o instanceof StoreChange;
+					return o instanceof Reaction;
 				}
 			}).subscribe(new Action1<Object>() {
 				@Override
 				public void call(Object o) {
-					object.onStoreChanged((StoreChange)o);
+					object.onReact((Reaction)o);
 				}
 			}));
 		}
@@ -163,8 +163,8 @@ public class FluxionDispatcher {
 		mBus.send(actionError);
 	}
 
-	public void postFluxionStoreChange(final StoreChange storeChange) {
-		mBus.send(storeChange);
+	public void postReaction(final Reaction reaction) {
+		mBus.send(reaction);
 	}
 
 	public void postFluxionStoreChangeError(final StoreChangeError storeChange) {

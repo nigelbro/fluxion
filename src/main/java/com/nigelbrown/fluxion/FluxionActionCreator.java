@@ -18,7 +18,7 @@ public abstract class FluxionActionCreator {
 		this.mManager = manager;
 	}
 
-	public FluxionAction newFluxionAction(String actionId,Object... data) {
+	private FluxionAction newFluxionAction(String actionId,Object... data) {
 		if(actionId.isEmpty()) {
 			throw new IllegalArgumentException("Type must not be empty");
 		}
@@ -40,7 +40,7 @@ public abstract class FluxionActionCreator {
 	 * @param actionId
 	 * @param data
 	 */
-	public void postAction(String actionId, Object... data) {
+	protected void postAction(String actionId, Object... data) {
 		final FluxionAction action = newFluxionAction(actionId,data);
 		Subscription subscription = Observable.empty()
 		                                      .observeOn(AndroidSchedulers.mainThread())
@@ -57,7 +57,7 @@ public abstract class FluxionActionCreator {
 		mManager.add(action, subscription);
 	}
 
-	public void postError(Throwable throwable) {
+	protected void postError(Throwable throwable) {
 		mDispatcher.postFluxionActionError(new FluxionActionError(throwable));
 	}
 }
