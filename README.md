@@ -23,13 +23,9 @@ class ExampleActivity extends Activity implement FluxionViewInterface{
   void onRegisterStores(){
     store.register();
   }
-  void onStoreChanged(StoreChange change){
-    switch(change.getStoreId){
-      case Constants.STORE_ID:
-        switch(change.getFluxionAction.getType()){
-          case Actions.SOME_ACTION:
-            //Open Fragment or update view
-        }
+  void onReact(Reaction reaction){
+    switch(reaction.getType()){
+      case Reactions.SOME_DISTINCT_REACTION:
         break;
     }
   }
@@ -56,7 +52,7 @@ allprojects {
 Add the dependency:
 ```gradle
 dependencies {
-	compile 'com.github.nigelbro:fluxion:v1.0'
+	compile 'com.github.nigelbro:fluxion:v1.3'
 }
 ```
 
@@ -105,12 +101,12 @@ Creating Stores
 5. Override methods in store interface
 6. Override onRxAction(RxAction action)
 7. Use Switch Statement to Decide on action logic
-8. postChange(new RxStoreChange(action,STORE_ID)) or postStoreChangeError(new CustomException())
+8. postReaction(String reactionId,Object... data) or postStoreChangeError(new CustomException())
 9. Done
 
 ```java
 //Emitting storeChange to Views once some work has been completed and or application state changed
-//This postChange() method will cause the dispatcher to call all Views registered to listen to store changes and call their onStoreChanged inherited method
+//This postReaction() method will cause the dispatcher to call all Views registered to react to store changes and call their onReact inherited method
 class AppStore extends RxStore implements AppStoreInterface {
 
     public AppStore(RxDispatcher dispatcher) {
@@ -122,7 +118,7 @@ class AppStore extends RxStore implements AppStoreInterface {
       switch(action.getType){
         case {ActionInterface}.{ACTION}
           //do something
-          postChange(new StoreChange(Constants.STORE_ID, action))
+          postReaction(Reactions.SOME_REACTION,Keys.SOME_KEY,value)
           break;
       }
     }
@@ -137,7 +133,7 @@ class AppStore extends FluxionStore implements AppStoreInterface {
     }
 
     @Override
-    public void onRxAction(FluxionAction action){
+    public void onFluxionAction(FluxionAction action){
       switch(action.getType){
         case {ActionInterface}.{ACTION}
           //something failed to happen
@@ -157,15 +153,15 @@ An ApiStore Example
 ```java
 public class ApiStore extends FluxionStore implements ApiStoreInterface {
 
-@Inject Ion mIon;
+private Ion mIon;
 private Context mContext;
 private List<Person> mUsers;
 
 @Inject
-public ApiStore(Dispatcher dispatcher, App app) {
+public ApiStore(Dispatcher dispatcher, App app, Ion ion) {
 	super(dispatcher);
-	app.getComponent().inject(this);
 	this.mContext = app;
+	this.mIon = ion;
 }
 
 @Override
@@ -183,7 +179,7 @@ public void onFluxionAction(FluxionAction action) {
 							    postChangeError(new StoreChangeError( NetworkRequestException("Message")));
 						     }else if(result.isSuccess()) {
 							          mUsers = result; //Store state of request so list of users this is good if you make multiple requests and you can give add this as a time, value pair and if this state has been updated in say the last 5 mins use it instead of sending another action to the action creator to make this network call.
-							          postChange(new StoreChange(Constants.API_STORE_ID, action));
+							          postReaction(Reactions.SUCCESSFUL_USER_API_ENDPOINT_CALL);
 						     }});
 			}
 				break;
