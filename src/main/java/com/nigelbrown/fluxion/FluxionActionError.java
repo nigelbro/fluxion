@@ -1,17 +1,16 @@
 package com.nigelbrown.fluxion;
 
-import android.support.v4.util.ArrayMap;
-
 /**
- * Created by Nigel.Brown on 5/12/2017.
+ * A wrapper for an exception that occurs in the process of posting an action.
  */
 public class FluxionActionError {
-	private Throwable mThrowable;
-	public FluxionActionError(Throwable throwable) {
-		this.mThrowable = throwable;
-	}
+    private Throwable mThrowable;
 
-	public Throwable getThrowable() {
-		return mThrowable;
-	}
+    public FluxionActionError(Throwable throwable) {
+        this.mThrowable = throwable;
+    }
+
+    public Throwable getThrowable() {
+        return mThrowable;
+    }
 }

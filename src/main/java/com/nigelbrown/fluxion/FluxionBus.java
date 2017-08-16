@@ -6,31 +6,31 @@ import rx.subjects.SerializedSubject;
 import rx.subjects.Subject;
 
 /**
- * Created by Nigel.Brown on 5/12/2017.
+ * The bus communicates store change events ({@link Reaction reactions} or
+ * {@link StoreChangeError errors}) to all views implementing {@link BaseFluxionViewInterface}.
  */
 public class FluxionBus {
-	private static FluxionBus sInstance;
-	private final Subject<Object, Object> mBus = new SerializedSubject<>(PublishSubject.create());
+    private static FluxionBus sInstance;
+    private final Subject<Object, Object> mBus = new SerializedSubject<>(PublishSubject.create());
 
-	private FluxionBus() {
-	}
+    private FluxionBus() {}
 
-	public synchronized static FluxionBus getInstance() {
-		if(sInstance == null) {
-			sInstance = new FluxionBus();
-		}
-		return sInstance;
-	}
+    public synchronized static FluxionBus getInstance() {
+        if (sInstance == null) {
+            sInstance = new FluxionBus();
+        }
+        return sInstance;
+    }
 
-	public void send(Object o) {
-		mBus.onNext(o);
-	}
+    void send(Object o) {mBus.onNext(o);}
 
-	public Observable<Object> get() {
-		return mBus;
-	}
+    /**
+     * @return the FluxionBus instance.
+     */
+    public Observable<Object> get() {return mBus;}
 
-	public boolean hasObservers() {
-		return mBus.hasObservers();
-	}
+    /**
+     * @return true if the bus has observers.
+     */
+    public boolean hasObservers() {return mBus.hasObservers();}
 }
