@@ -102,6 +102,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="design-25.4.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="espresso-intents-3.0.0" level="project" />
     <orderEntry type="library" exported="" name="reflections-0.9.9" level="project" />
+    <orderEntry type="library" exported="" name="1_reflections-0.9.9" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="espresso-core-3.0.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="support-core-ui-25.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-25.3.1" level="project" />
@@ -114,9 +115,9 @@
     <orderEntry type="library" exported="" name="support-fragment-25.3.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="runner-1.0.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="objenesis-2.1" level="project" />
-    <orderEntry type="library" exported="" name="guava-18.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="javax.inject-1" level="project" />
     <orderEntry type="library" exported="" name="annotations-2.0.1" level="project" />
+    <orderEntry type="library" exported="" name="guava-15.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="kxml2-2.3.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="javawriter-2.1.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="support-v4-25.4.0" level="project" />
@@ -127,7 +128,6 @@
     <orderEntry type="library" exported="" name="javassist-3.18.2-GA" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.12" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="recyclerview-v7-25.4.0" level="project" />
-    <orderEntry type="library" exported="" name="reflections-0.9.10" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="support-annotations-25.4.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="appcompat-v7-25.4.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="support-vector-drawable-25.4.0" level="project" />

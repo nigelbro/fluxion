@@ -6,6 +6,7 @@ import com.nigelbrown.fluxion.Annotation.Store;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
@@ -67,7 +68,8 @@ final class AnnotationHelper {
 	}
 
 	static Set<Class<?>> getClassesAnnotatedWithStore() {
-		Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forJavaClassPath()).setScanners(new TypeAnnotationsScanner()));
+
+		Reflections reflections = new Reflections(new ConfigurationBuilder().setUrls(ClasspathHelper.forJavaClassPath()).setScanners(new SubTypesScanner(),new TypeAnnotationsScanner()));
 		return reflections.getTypesAnnotatedWith(Store.class);
 	}
 }
