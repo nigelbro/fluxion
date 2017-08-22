@@ -49,7 +49,7 @@ public class Reaction {
 
 	@Override
 	public String toString() {
-		return "FluxionAction{" + "mType='" + mType + '\'' + ", mData=" + mData + '}';
+		return "FluxAction{" + "mType='" + mType + '\'' + ", mData=" + mData + '}';
 	}
 
 	public static class Builder {
