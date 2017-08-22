@@ -99,8 +99,8 @@ Creating Stores
 3. Extend RxStore
 4. implement {Some}StoreInterface
 5. Override methods in store interface
-6. Override onRxAction(RxAction action)
-7. Use Switch Statement to Decide on action logic
+6. Override onRxAction(RxAction fluxAction)
+7. Use Switch Statement to Decide on fluxAction logic
 8. postReaction(String reactionId,Object... data) or postStoreChangeError(new CustomException())
 9. Done
 
@@ -114,8 +114,8 @@ class AppStore extends RxStore implements AppStoreInterface {
     }
 
     @Override
-    public void onFluxionAction(RxAction action) {
-      switch(action.getType){
+    public void onFluxionAction(RxAction fluxAction) {
+      switch(fluxAction.getType){
         case {ActionInterface}.{ACTION}
           //do something
           postReaction(Reactions.SOME_REACTION,Keys.SOME_KEY,value)
@@ -133,8 +133,8 @@ class AppStore extends FluxionStore implements AppStoreInterface {
     }
 
     @Override
-    public void onFluxionAction(FluxionAction action){
-      switch(action.getType){
+    public void onFluxionAction(FluxionAction fluxAction){
+      switch(fluxAction.getType){
         case {ActionInterface}.{ACTION}
           //something failed to happen
           postChangeError(new CustomException(Some Data));
@@ -165,20 +165,20 @@ public ApiStore(Dispatcher dispatcher, App app, Ion ion) {
 }
 
 @Override
-public void onFluxionAction(FluxionAction action) {
-	switch(action.getType()) {
+public void onFluxionAction(FluxionAction fluxAction) {
+	switch(fluxAction.getType()) {
 		case ApiActions.MAKE_SOME_NETWORK_REQUEST:
 			if(!internetAvailable){
 				postChangeError(new StoreChangeError(new NoInternetConnectionError(NO_INTERNET_MESSAGE)));
 			}else {
-				Observable.just(getUsers(action))
+				Observable.just(getUsers(fluxAction))
 					  .subscribeOn(Schedulers.io())
 					  .observeOn(AndroidSchedulers.mainThread())
 					  .subscribe(result -> {
 						     if(result == null || !result.isSuccess()){
 							    postChangeError(new StoreChangeError( NetworkRequestException("Message")));
 						     }else if(result.isSuccess()) {
-							          mUsers = result; //Store state of request so list of users this is good if you make multiple requests and you can give add this as a time, value pair and if this state has been updated in say the last 5 mins use it instead of sending another action to the action creator to make this network call.
+							          mUsers = result; //Store state of request so list of users this is good if you make multiple requests and you can give add this as a time, value pair and if this state has been updated in say the last 5 mins use it instead of sending another fluxAction to the fluxAction creator to make this network call.
 							          postReaction(Reactions.SUCCESSFUL_USER_API_ENDPOINT_CALL);
 						     }});
 			}
@@ -197,10 +197,10 @@ This method would be placed inside on the ApiStoreInterface.java
 /**
 This is clean and simplified way to use Ion as an Object and make Synchronous calls and parse objects as responses
 **/
-private List<Person> getUsersRequest(final RxAction action) {
+private List<Person> getUsersRequest(final RxAction fluxAction) {
 	List<Person> users = new ArrayList();
 	try {
-		users = mIon.build(mContext).load(POST,BuildConfig.BACKEND + GET_USERS_ENDPOINT).setBodyParameters(createPostParams(new ApiAuth(action.get(Keys.USER_API_CRED)))).as(new TypeToken<List<Person>>() {}).get();
+		users = mIon.build(mContext).load(POST,BuildConfig.BACKEND + GET_USERS_ENDPOINT).setBodyParameters(createPostParams(new ApiAuth(fluxAction.get(Keys.USER_API_CRED)))).as(new TypeToken<List<Person>>() {}).get();
 	}catch(Exception ie){
 		ie.printStackTrace();
 	}
