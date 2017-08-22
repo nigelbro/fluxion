@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public abstract class FluxStore {
 
-	private FluxStore() {}
+	public FluxStore() {}
 
 	private Reaction newReaction(String reactionId,Object... data) {
 		if(reactionId.isEmpty()) {

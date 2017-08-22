@@ -7,8 +7,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public abstract class FluxActionCreator {
 
-	private FluxActionCreator() {
-	}
+	public FluxActionCreator() {}
 
 	/**
 	 * This is the prefered method for posting actions to the subscription manager
