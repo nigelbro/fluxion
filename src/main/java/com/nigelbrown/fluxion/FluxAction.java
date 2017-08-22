@@ -5,11 +5,11 @@ import android.support.v4.util.ArrayMap;
 /**
  * Created by Nigel.Brown on 5/12/2017.
  */
-public class FluxionAction {
+public class FluxAction {
 	private final String mType;
 	private final ArrayMap<String, Object> mData;
 
-	FluxionAction(String type, ArrayMap<String, Object> data) {
+	FluxAction(String type, ArrayMap<String, Object> data) {
 		this.mType = type;
 		this.mData = data;
 	}
@@ -34,10 +34,10 @@ public class FluxionAction {
 	@Override
 	public boolean equals(Object o) {
 		if(this == o) { return true; }
-		if(! (o instanceof FluxionAction)) { return false; }
-		FluxionAction fluxionAction = (FluxionAction)o;
-		if(! mType.equals(fluxionAction.mType)) { return false; }
-		return ! (mData != null ? ! mData.equals(fluxionAction.mData) : fluxionAction.mData != null);
+		if(! (o instanceof FluxAction)) { return false; }
+		FluxAction fluxAction = (FluxAction)o;
+		if(! mType.equals(fluxAction.mType)) { return false; }
+		return ! (mData != null ? ! mData.equals(fluxAction.mData) : fluxAction.mData != null);
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class FluxionAction {
 
 	@Override
 	public String toString() {
-		return "FluxionAction{" + "mType='" + mType + '\'' + ", mData=" + mData + '}';
+		return "FluxAction{" + "mType='" + mType + '\'' + ", mData=" + mData + '}';
 	}
 
 	public static class Builder {
@@ -76,11 +76,11 @@ public class FluxionAction {
 			return this;
 		}
 
-		public FluxionAction build() {
+		public FluxAction build() {
 			if(type == null || type.isEmpty()) {
 				throw new IllegalArgumentException("At least one key is required.");
 			}
-			return new FluxionAction(type, data);
+			return new FluxAction(type, data);
 		}
 	}
 }
