@@ -19,7 +19,7 @@ public abstract class FluxStore {
 		msFluxInstance = flux;
 	}
 
-	public void registerActionSubscriber(Class<?> storeClass) {
+	public void registerActionSubscriber(Object storeClass) {
 		msFluxInstance.registerActionSubscriber(storeClass);
 	}
 
