@@ -20,9 +20,9 @@ import java.util.Set;
 /**
  * Created by Nigel.Brown on 8/21/2017.
  */
-final class AnnotationHelper {
+public class AnnotationHelper {
 
-	private AnnotationHelper(){}
+	public AnnotationHelper(){}
 
 	static void callMethodsWithReactAnnotation(Reaction reaction) throws IllegalAccessException,InvocationTargetException {
 		Set<Method> reactMethods = getMethodsAnnotatedWithReact();
