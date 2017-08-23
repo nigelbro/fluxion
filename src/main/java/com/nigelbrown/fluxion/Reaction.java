@@ -32,19 +32,19 @@ public class Reaction {
 	}
 
 	@Override
+	public int hashCode() {
+		int result = mType.hashCode();
+		result = 31 * result + (mData != null ? mData.hashCode() : 0);
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if(this == o) { return true; }
 		if(! (o instanceof Reaction)) { return false; }
 		Reaction reaction = (Reaction)o;
 		if(! mType.equals(reaction.mType)) { return false; }
 		return ! (mData != null ? ! mData.equals(reaction.mData) : reaction.mData != null);
-	}
-
-	@Override
-	public int hashCode() {
-		int result = mType.hashCode();
-		result = 31 * result + (mData != null ? mData.hashCode() : 0);
-		return result;
 	}
 
 	@Override

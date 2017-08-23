@@ -32,19 +32,19 @@ public class FluxAction {
 	}
 
 	@Override
+	public int hashCode() {
+		int result = mType.hashCode();
+		result = 31 * result + (mData != null ? mData.hashCode() : 0);
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if(this == o) { return true; }
 		if(! (o instanceof FluxAction)) { return false; }
 		FluxAction fluxAction = (FluxAction)o;
 		if(! mType.equals(fluxAction.mType)) { return false; }
 		return ! (mData != null ? ! mData.equals(fluxAction.mData) : fluxAction.mData != null);
-	}
-
-	@Override
-	public int hashCode() {
-		int result = mType.hashCode();
-		result = 31 * result + (mData != null ? mData.hashCode() : 0);
-		return result;
 	}
 
 	@Override
