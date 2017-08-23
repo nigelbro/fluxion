@@ -11,7 +11,7 @@ This architecture system is designed to allow for linear data flow, immutability
  * Post store change.
 
 ```java
-class ExampleActivity extends Activity implement FluxionViewInterface{
+class ExampleActivity extends Activity {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -19,21 +19,9 @@ class ExampleActivity extends Activity implement FluxionViewInterface{
     ButterKnife.bind(this);
     // TODO Use fields...
   }
-
-  void onRegisterStores(){
-    store.register();
-  }
-  void onReact(Reaction reaction){
-    switch(reaction.getType()){
-      case Reactions.SOME_DISTINCT_REACTION:
-        break;
-    }
-  }
-
-  void onStoreChangedError(StoreChangeError error){
-    if(error.getThrowable() instanceOf SomeCustomException){
-      //Do something with views
-    }
+  @React
+  public void doSomeViewThing(Reaction reaction){
+  
   }
 }
 ```
@@ -52,7 +40,7 @@ allprojects {
 Add the dependency:
 ```gradle
 dependencies {
-	compile 'com.github.nigelbro:fluxion:v1.3'
+	compile 'com.github.nigelbro:fluxion:v2.1'
 }
 ```
 
@@ -69,22 +57,23 @@ Actions Creators are Synchronous which means you should not be doing any work. I
 3. Extend RxActionCreator
 4. implement Actions interface
 5. Override methods in Actions interface
-6. call FluxionActionCreator  postAction(String actionId, Object... data) in Actions Interface method definition.
+6. call FluxActionCreator  emitAction(String actionId, Object... data) in Actions Interface method definition.
 7. done
 
 
 
 ```java
 
-class ActionCreator extends FluxionActionCreator implements Actions{
+class ActionCreator extends FluxActionCreator implements Actions {
 
-    public ActionCreator(Dispatcher dispatcher,SubscriptionManager manager){
-      super(dispatcher,manager);
+    @Inject
+    public ActionCreator(Flux flux) {
+	super(flux);
     }
 
     @Override
     someMethodDeclarationinActionsInterface(){
-      postAction(String actionId,Object... data);
+      emitAction(String actionId,Object... data);
     }
 
 }
@@ -95,127 +84,29 @@ Stores are responsible for all business logic and application state. This is the
 Creating Stores
 
 1. Create New Class {Some}Store
-2. Create Corresponding {Some}StoreInterface
-3. Extend RxStore
-4. implement {Some}StoreInterface
-5. Override methods in store interface
-6. Override onRxAction(RxAction fluxAction)
-7. Use Switch Statement to Decide on fluxAction logic
-8. postReaction(String reactionId,Object... data) or postStoreChangeError(new CustomException())
-9. Done
+2. Extend FluxStore
+3. Create @Action annotated methods
+4. emitReaction(String reactionId,Object... data)
+5. Done
 
 ```java
-//Emitting storeChange to Views once some work has been completed and or application state changed
-//This postReaction() method will cause the dispatcher to call all Views registered to react to store changes and call their onReact inherited method
-class AppStore extends RxStore implements AppStoreInterface {
+//Emitting reactions to Views once some work has been completed and or application state changed
+//This emitReaction() method will call all methods with @React annotation and match the correction reactionType
+class AppStore extends FluxStore {
 
-    public AppStore(RxDispatcher dispatcher) {
-      super(dispatcher);
+    @Inject
+    public MathStore(Flux flux) {
+	super(flux);
+	registerActionSubscriber(MathStore.this);
     }
-
-    @Override
-    public void onFluxionAction(RxAction fluxAction) {
-      switch(fluxAction.getType){
-        case {ActionInterface}.{ACTION}
-          //do something
-          postReaction(Reactions.SOME_REACTION,Keys.SOME_KEY,value)
-          break;
-      }
+    
+    @Action(actionType = SOME_ACTION_TYPE)
+    public void someMethod(FluxAction action) {
+	//Do some work or business logic update state variables
+	emitReaction(SOME_REACTION_TYPE);
     }
 }
 
-//Emitting storeChangeError Views to once some work has failed and or application state could not be changed
-//This postChangeError() method will cause the dispatcher to call all Views registered to listen to store changes and call their onStoreChangedError inherited method
-class AppStore extends FluxionStore implements AppStoreInterface {
-
-    public AppStore(Dispatcher dispatcher){
-      super(dispatcher);
-    }
-
-    @Override
-    public void onFluxionAction(FluxionAction fluxAction){
-      switch(fluxAction.getType){
-        case {ActionInterface}.{ACTION}
-          //something failed to happen
-          postChangeError(new CustomException(Some Data));
-          break;
-      }
-    }
-}
-
-```
-
-An ApiStore Example
-
-*Create ApiStore to handle all networking*
-*This is an example using Ion*
-
-```java
-public class ApiStore extends FluxionStore implements ApiStoreInterface {
-
-private Ion mIon;
-private Context mContext;
-private List<Person> mUsers;
-
-@Inject
-public ApiStore(Dispatcher dispatcher, App app, Ion ion) {
-	super(dispatcher);
-	this.mContext = app;
-	this.mIon = ion;
-}
-
-@Override
-public void onFluxionAction(FluxionAction fluxAction) {
-	switch(fluxAction.getType()) {
-		case ApiActions.MAKE_SOME_NETWORK_REQUEST:
-			if(!internetAvailable){
-				postChangeError(new StoreChangeError(new NoInternetConnectionError(NO_INTERNET_MESSAGE)));
-			}else {
-				Observable.just(getUsers(fluxAction))
-					  .subscribeOn(Schedulers.io())
-					  .observeOn(AndroidSchedulers.mainThread())
-					  .subscribe(result -> {
-						     if(result == null || !result.isSuccess()){
-							    postChangeError(new StoreChangeError( NetworkRequestException("Message")));
-						     }else if(result.isSuccess()) {
-							          mUsers = result; //Store state of request so list of users this is good if you make multiple requests and you can give add this as a time, value pair and if this state has been updated in say the last 5 mins use it instead of sending another fluxAction to the fluxAction creator to make this network call.
-							          postReaction(Reactions.SUCCESSFUL_USER_API_ENDPOINT_CALL);
-						     }});
-			}
-				break;
-	}
-}
-
-/**
-This method would be placed inside on the ApiStoreInterface.java
-**/
-  @Override
-  public Person getUsers(){
-    return mUsers;
-  }
-
-/**
-This is clean and simplified way to use Ion as an Object and make Synchronous calls and parse objects as responses
-**/
-private List<Person> getUsersRequest(final RxAction fluxAction) {
-	List<Person> users = new ArrayList();
-	try {
-		users = mIon.build(mContext).load(POST,BuildConfig.BACKEND + GET_USERS_ENDPOINT).setBodyParameters(createPostParams(new ApiAuth(fluxAction.get(Keys.USER_API_CRED)))).as(new TypeToken<List<Person>>() {}).get();
-	}catch(Exception ie){
-		ie.printStackTrace();
-	}
-		return users;
-}
-
-/**
-This is a helper method for building the mapping postParams for a Ion request
-**/
-private Map<String, List<String>> createPostParams(ApiAuth credentials) {
-	Map<String, List<String>> params = new HashMap<>();
-    	params.put(TOKEN, Arrays.asList(credentials.token));
-	return params;
-}
-```
 ## Bugs and Feedback
 
 For bugs, feature requests, and discussion please use [GitHub Issues][issues].
