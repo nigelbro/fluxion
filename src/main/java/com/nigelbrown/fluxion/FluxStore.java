@@ -40,8 +40,7 @@ public abstract class FluxStore {
 		return reactionBuilder.build();
 	}
 
-	protected void emitReaction(String reactionId, Object... data) throws IllegalAccessException,
-			InvocationTargetException {
+	protected void emitReaction(String reactionId, Object... data) {
 		if(reactionId.isEmpty()) {
 			throw new IllegalArgumentException("Type must not be empty");
 		}

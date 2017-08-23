@@ -25,7 +25,7 @@ public abstract class FluxActionCreator {
 	 * @param actionId
 	 * @param data
 	 */
-	protected void emitAction(String actionId, Object... data)  throws IllegalAccessException,InvocationTargetException {
+	protected void emitAction(String actionId, Object... data) {
 		if(actionId.isEmpty()) {
 			throw new IllegalArgumentException("Type must not be empty");
 		}
