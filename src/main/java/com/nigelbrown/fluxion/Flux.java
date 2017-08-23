@@ -51,6 +51,7 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 
 	public static Flux init(Application application) {
 		if(sInstance != null) { return sInstance; }
+
 		return sInstance = new Flux(application);
 	}
 

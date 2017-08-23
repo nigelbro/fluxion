@@ -14,10 +14,13 @@ import io.reactivex.schedulers.Schedulers;
  * Created by Nigel.Brown on 5/12/2017.
  */
 public abstract class FluxStore {
-	public FluxStore() {}
+	private Flux msFluxInstance;
+	public FluxStore(Flux flux) {
+		msFluxInstance = flux;
+	}
 
 	public void registerActionSubscriber(Class<?> storeClass) {
-		Flux.getsInstance().registerActionSubscriber(storeClass);
+		msFluxInstance.registerActionSubscriber(storeClass);
 	}
 
 	private Reaction newReaction(String reactionId, Object... data) {
@@ -53,7 +56,7 @@ public abstract class FluxStore {
 			reactionBuilder.bundle(key, value);
 		}
 		final Reaction reaction = reactionBuilder.build();
-		Flux.getsInstance().emitReaction(reaction).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(getReactionObserver());
+		msFluxInstance.emitReaction(reaction).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(getReactionObserver());
 	}
 
 	Observer getReactionObserver() {

@@ -15,7 +15,10 @@ import io.reactivex.schedulers.Schedulers;
  */
 public abstract class FluxActionCreator {
 
-	public FluxActionCreator() {}
+	private Flux msFluxInstance;
+	public FluxActionCreator(Flux flux) {
+		msFluxInstance = flux;
+	}
 
 	/**
 	 * This is the prefered method for posting actions to the subscription manager
@@ -37,7 +40,7 @@ public abstract class FluxActionCreator {
 			actionBuilder.bundle(key, value);
 		}
 		final FluxAction fluxAction = actionBuilder.build();
-		Flux.getsInstance().emitAction(fluxAction)
+		msFluxInstance.emitAction(fluxAction)
 		    .subscribeOn(Schedulers.computation())
 			.observeOn(AndroidSchedulers.mainThread())
 		.subscribe(getActionObserver());
