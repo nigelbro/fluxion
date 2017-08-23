@@ -1,6 +1,18 @@
 package com.nigelbrown.fluxion;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Objects;
+
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Nigel.Brown on 5/12/2017.
@@ -29,6 +41,39 @@ public abstract class FluxActionCreator {
 			actionBuilder.bundle(key, value);
 		}
 		final FluxAction fluxAction = actionBuilder.build();
-		AnnotationHelper.callMethodsWithActionAnnotation(fluxAction);
+		Flux.getsInstance().emitAction(fluxAction)
+		    .subscribeOn(Schedulers.computation())
+			.observeOn(AndroidSchedulers.mainThread())
+		.subscribe(getActionObserver());
+	}
+
+	Observer getActionObserver(){
+		return new Observer() {
+			@Override
+			public void onSubscribe(@NonNull Disposable d) {
+			}
+
+			@Override
+			public void onNext(@NonNull Object o) {
+				HashMap<String,Object> map = (HashMap<String, Object>)o;
+				Method method = (Method)map.get("METHOD");
+				Class<?> parentClass = (Class<?>)map.get("CLASS");
+				FluxAction action = (FluxAction)map.get("ACTION");
+				try {
+					method.invoke(parentClass,action);
+				}catch(Exception e){
+
+				}
+			}
+
+			@Override
+			public void onError(@NonNull Throwable e) {
+			}
+
+			@Override
+			public void onComplete() {
+			}
+		};
+
 	}
 }
