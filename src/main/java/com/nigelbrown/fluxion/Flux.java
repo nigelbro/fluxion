@@ -33,11 +33,11 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 	/**
 	 * Cache react methods for each class.
 	 */
-	private static final ConcurrentMap<Class<?>, Set<Method>> REACT_CACHE = new ConcurrentHashMap<Class<?>, Set<Method>>();
+	private static final ConcurrentMap<Object, Set<Method>> REACT_CACHE = new ConcurrentHashMap<Object, Set<Method>>();
 	/**
 	 * Cache action methods for each store class.
 	 */
-	private static final ConcurrentMap<Class<?>, Set<Method>> ACTIONS_CACHE = new ConcurrentHashMap<Class<?>, Set<Method>>();
+	private static final ConcurrentMap<Object, Set<Method>> ACTIONS_CACHE = new ConcurrentHashMap<Object, Set<Method>>();
 	public static String TAG = "RxFlux";
 	private static Flux sInstance;
 
@@ -97,14 +97,14 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 	public void onActivityDestroyed(Activity activity) {
 	}
 
-	void registerActionSubscriber(Class<?> storeClass) {
+	void registerActionSubscriber(Object storeClass) {
 		ExecutorService storeExecutor = Executors.newFixedThreadPool(1);
-		if(storeClass.isAnnotationPresent(Store.class)) {
+		if(storeClass.getClass().isAnnotationPresent(Store.class)) {
 			storeExecutor.execute(new MethodsWithActionAnnotationHelperRunnable(storeClass));
 		}
 	}
 
-	public void registerReactionSubscriber(Class<?> viewClass) {
+	public void registerReactionSubscriber(Object viewClass) {
 		ExecutorService reactionExecuter = Executors.newFixedThreadPool(1);
 		reactionExecuter.execute(new MethodsWithReactAnnotationHelperRunnable(viewClass));
 	}
@@ -113,7 +113,7 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 		return Observable.just(action).create(new ObservableOnSubscribe() {
 			@Override
 			public void subscribe(@NonNull ObservableEmitter e) throws Exception {
-				for(Class<?> parentClass : ACTIONS_CACHE.keySet()) {
+				for(Object parentClass : ACTIONS_CACHE.keySet()) {
 					for(Method method : ACTIONS_CACHE.get(parentClass)) {
 						if(action.getType().equals(method.getAnnotation(Action.class).actionType())) {
 							HashMap<String, Object> map = new HashMap<String, Object>();
@@ -133,8 +133,8 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 		return Observable.just(reaction).create(new ObservableOnSubscribe() {
 			@Override
 			public void subscribe(@NonNull ObservableEmitter e) throws Exception {
-				for(Class<?> parentClass : ACTIONS_CACHE.keySet()) {
-					for(Method method : ACTIONS_CACHE.get(parentClass)) {
+				for(Object parentClass : REACT_CACHE.keySet()) {
+					for(Method method : REACT_CACHE.get(parentClass)) {
 						if(reaction.getType().equals(method.getAnnotation(React.class).reactionType())) {
 							HashMap<String, Object> map = new HashMap<String, Object>();
 							map.put("METHOD", method);
@@ -150,16 +150,16 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 	}
 
 	private class MethodsWithReactAnnotationHelperRunnable implements Runnable {
-		private Class<?> parentClass;
+		private Object parentClass;
 
-		public MethodsWithReactAnnotationHelperRunnable(Class<?> parentClass) {
+		public MethodsWithReactAnnotationHelperRunnable(Object parentClass) {
 			this.parentClass = parentClass;
 		}
 
 		public void run() {
 			if(! REACT_CACHE.containsKey(parentClass)) {
 				Set<Method> classMethods = new HashSet<>();
-				for(Method method : parentClass.getDeclaredMethods()) {
+				for(Method method : parentClass.getClass().getDeclaredMethods()) {
 					Class[] paramTypes = method.getParameterTypes();
 					if(method.isAnnotationPresent(React.class) && paramTypes.length == 1 && paramTypes[0].equals(Reaction.class)) {
 						classMethods.add(method);
@@ -171,16 +171,16 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 	}
 
 	private class MethodsWithActionAnnotationHelperRunnable implements Runnable {
-		private Class<?> parentClass;
+		private Object parentClass;
 
-		public MethodsWithActionAnnotationHelperRunnable(Class<?> parentClass) {
+		public MethodsWithActionAnnotationHelperRunnable(Object parentClass) {
 			this.parentClass = parentClass;
 		}
 
 		public void run() {
 			if(! ACTIONS_CACHE.containsKey(parentClass)) {
 				Set<Method> classMethods = new HashSet<>();
-				for(Method method : parentClass.getDeclaredMethods()) {
+				for(Method method : parentClass.getClass().getDeclaredMethods()) {
 					Class[] paramTypes = method.getParameterTypes();
 					if(method.isAnnotationPresent(Action.class) && paramTypes.length == 1 && paramTypes[0].equals(FluxAction.class)) {
 						classMethods.add(method);

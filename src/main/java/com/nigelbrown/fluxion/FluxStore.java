@@ -69,10 +69,9 @@ public abstract class FluxStore {
 			public void onNext(@NonNull Object o) {
 				HashMap<String, Object> map = (HashMap<String, Object>)o;
 				Method method = (Method)map.get("METHOD");
-				Class<?> parentClass = (Class<?>)map.get("CLASS");
 				Reaction reaction = (Reaction)map.get("REACTION");
 				try {
-					method.invoke(parentClass, reaction);
+					method.invoke(map.get("CLASS"), reaction);
 				}catch(Exception e) {
 				}
 			}

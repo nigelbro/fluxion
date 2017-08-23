@@ -56,10 +56,9 @@ public abstract class FluxActionCreator {
 			public void onNext(@NonNull Object o) {
 				HashMap<String,Object> map = (HashMap<String, Object>)o;
 				Method method = (Method)map.get("METHOD");
-				Class<?> parentClass = (Class<?>)map.get("CLASS");
 				FluxAction action = (FluxAction)map.get("ACTION");
 				try {
-					method.invoke(parentClass,action);
+					method.invoke(map.get("CLASS"),action);
 				}catch(Exception e){
 
 				}
