@@ -10,6 +10,8 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static javax.xml.transform.OutputKeys.METHOD;
+
 /**
  * Created by Nigel.Brown on 5/12/2017.
  */
@@ -55,10 +57,10 @@ public abstract class FluxActionCreator {
 			@Override
 			public void onNext(@NonNull Object o) {
 				HashMap<String,Object> map = (HashMap<String, Object>)o;
-				Method method = (Method)map.get("METHOD");
-				FluxAction action = (FluxAction)map.get("ACTION");
+				Method method = (Method)map.get(METHOD);
+				FluxAction action = (FluxAction)map.get(Flux.ACTION);
 				try {
-					method.invoke(map.get("CLASS"),action);
+					method.invoke(map.get(Flux.CLASS),action);
 				}catch(Exception e){
 
 				}

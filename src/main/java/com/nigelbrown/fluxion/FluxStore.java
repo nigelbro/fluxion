@@ -1,6 +1,5 @@
 package com.nigelbrown.fluxion;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -9,6 +8,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+
+import static javax.xml.transform.OutputKeys.METHOD;
 
 /**
  * Created by Nigel.Brown on 5/12/2017.
@@ -67,10 +68,10 @@ public abstract class FluxStore {
 			@Override
 			public void onNext(@NonNull Object o) {
 				HashMap<String, Object> map = (HashMap<String, Object>)o;
-				Method method = (Method)map.get("METHOD");
-				Reaction reaction = (Reaction)map.get("REACTION");
+				Method method = (Method)map.get(METHOD);
+				Reaction reaction = (Reaction)map.get(Flux.REACTION);
 				try {
-					method.invoke(map.get("CLASS"), reaction);
+					method.invoke(map.get(Flux.CLASS), reaction);
 				}catch(Exception e) {
 				}
 			}

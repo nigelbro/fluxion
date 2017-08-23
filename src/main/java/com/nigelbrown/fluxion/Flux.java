@@ -26,6 +26,8 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.annotations.NonNull;
 
+import static javax.xml.transform.OutputKeys.METHOD;
+
 /**
  * Created by Nigel.Brown on 8/23/2017.
  */
@@ -38,6 +40,9 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 	 * Cache action methods for each store class.
 	 */
 	private static final ConcurrentMap<Object, Set<Method>> ACTIONS_CACHE = new ConcurrentHashMap<Object, Set<Method>>();
+	public static final String CLASS = "class";
+	public static final String ACTION = "action";
+	public static final String REACTION = "reaction";
 	public static String TAG = "RxFlux";
 	private static Flux sInstance;
 
@@ -57,13 +62,18 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 
 	@Override
 	public void onActivityCreated(Activity activity, Bundle bundle) {
-		final ExecutorService classExecutor = Executors.newFixedThreadPool(2);
-		classExecutor.execute(new MethodsWithReactAnnotationHelperRunnable(activity.getClass()));
+		registerReactionSubscriber(activity);
 		((AppCompatActivity)activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
 			@Override
-			public void onFragmentAttached(FragmentManager fragmentManager, Fragment fragment, Context context) {
+			public void onFragmentAttached(FragmentManager fragmentManager, final Fragment fragment, Context context) {
 				super.onFragmentAttached(fragmentManager, fragment, context);
-				classExecutor.execute(new MethodsWithReactAnnotationHelperRunnable(fragment.getClass()));
+				final ExecutorService classExecutor = Executors.newFixedThreadPool(1);
+				classExecutor.execute(new Thread(new Runnable() {
+					@Override
+					public void run() {
+						registerReactionSubscriber(fragment);
+					}
+				}));
 			}
 
 			@Override
@@ -105,8 +115,16 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 	}
 
 	public void registerReactionSubscriber(Object viewClass) {
-		ExecutorService reactionExecuter = Executors.newFixedThreadPool(1);
-		reactionExecuter.execute(new MethodsWithReactAnnotationHelperRunnable(viewClass));
+		if(! REACT_CACHE.containsKey(viewClass)) {
+			Set<Method> classMethods = new HashSet<>();
+			for(Method method : viewClass.getClass().getDeclaredMethods()) {
+				Class[] paramTypes = method.getParameterTypes();
+				if(method.isAnnotationPresent(React.class) && paramTypes.length == 1 && paramTypes[0].equals(Reaction.class)) {
+					classMethods.add(method);
+				}
+			}
+			REACT_CACHE.put(viewClass, classMethods);
+		}
 	}
 
 	Observable emitAction(final FluxAction action) {
@@ -117,9 +135,9 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 					for(Method method : ACTIONS_CACHE.get(parentClass)) {
 						if(action.getType().equals(method.getAnnotation(Action.class).actionType())) {
 							HashMap<String, Object> map = new HashMap<String, Object>();
-							map.put("METHOD", method);
-							map.put("CLASS", parentClass);
-							map.put("ACTION", action);
+							map.put(METHOD, method);
+							map.put(CLASS, parentClass);
+							map.put(ACTION, action);
 							e.onNext(map);
 						}
 					}
@@ -137,9 +155,9 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 					for(Method method : REACT_CACHE.get(parentClass)) {
 						if(reaction.getType().equals(method.getAnnotation(React.class).reactionType())) {
 							HashMap<String, Object> map = new HashMap<String, Object>();
-							map.put("METHOD", method);
-							map.put("CLASS", parentClass);
-							map.put("REACTION", reaction);
+							map.put(METHOD, method);
+							map.put(CLASS, parentClass);
+							map.put(REACTION, reaction);
 							e.onNext(map);
 						}
 					}
@@ -147,27 +165,6 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 				e.onComplete();
 			}
 		});
-	}
-
-	private class MethodsWithReactAnnotationHelperRunnable implements Runnable {
-		private Object parentClass;
-
-		public MethodsWithReactAnnotationHelperRunnable(Object parentClass) {
-			this.parentClass = parentClass;
-		}
-
-		public void run() {
-			if(! REACT_CACHE.containsKey(parentClass)) {
-				Set<Method> classMethods = new HashSet<>();
-				for(Method method : parentClass.getClass().getDeclaredMethods()) {
-					Class[] paramTypes = method.getParameterTypes();
-					if(method.isAnnotationPresent(React.class) && paramTypes.length == 1 && paramTypes[0].equals(Reaction.class)) {
-						classMethods.add(method);
-					}
-				}
-				REACT_CACHE.put(parentClass, classMethods);
-			}
-		}
 	}
 
 	private class MethodsWithActionAnnotationHelperRunnable implements Runnable {
