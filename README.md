@@ -150,7 +150,7 @@ public class DummyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
 	@Override
 	public int getItemCount() {
-		return mAiObjectList.size();
+		return mObjectList.size();
 	}
 
 	@React(reactionType = ADD_ITEM)
