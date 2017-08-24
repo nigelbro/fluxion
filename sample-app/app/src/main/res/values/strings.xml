@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MathAddict</string>
+
+    <string-array name="level_one_addition">
+        <item>1 + 1 =</item>
+        <item>1 + 2 =</item>
+        <item>1 + 3 =</item>
+        <item>1 + 4 =</item>
+        <item>1 + 5 =</item>
+    </string-array>
+
+</resources>
