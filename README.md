@@ -17,6 +17,7 @@ class ExampleActivity extends Activity {
     ButterKnife.bind(this);
     // TODO Use fields...
   }
+  
   @React
   public void doSomeViewThing(Reaction reaction){
   
@@ -47,12 +48,9 @@ More examples
 
 Creating ActionCreators
 
-Actions Creators are Synchronous which means you should not be doing any work. It is here to simply pass actions to the subscription manager to emit to onRxAction in the Stores.
-
-
 1. Create New Class ActionsCreator
 2. Create Corresponding Actions interface
-3. Extend RxActionCreator
+3. Extend FluxActionCreator
 4. implement Actions interface
 5. Override methods in Actions interface
 6. call FluxActionCreator  emitAction(String actionId, Object... data) in Actions Interface method definition.
@@ -71,25 +69,32 @@ class ActionCreator extends FluxActionCreator implements Actions {
 
     @Override
     someMethodDeclarationinActionsInterface(){
-      emitAction(String actionId,Object... data);
+      emitAction(SOME_ACTION);
+    }
+    
+     @Override
+    someMethodDeclarationinActionsInterface(String data){
+      emitAction(SOME_ACTION,Keys.SOME_KEY,data);
     }
 
 }
 
 ```
-Stores are responsible for all business logic and application state. This is the only place you will do worked that needs to be either displayed by a View or store state that needs to be accessed by a View.
+Stores are responsible for all business logic and application state. This is the only place you will do work that needs to be either displayed by a View or store state that needs to be accessed by a View.
 
 Creating Stores
 
 1. Create New Class {Some}Store
-2. Extend FluxStore
-3. Create @Action annotated methods
-4. emitReaction(String reactionId,Object... data)
-5. Done
+2. Annotate Class with @Store annotation
+3. Extend FluxStore
+4. Create @Action annotated methods
+5. emitReaction(String reactionId,Object... data)
+6. Done
 
 ```java
 //Emitting reactions to Views once some work has been completed and or application state changed
 //This emitReaction() method will call all methods with @React annotation and match the correction reactionType
+@Store
 class AppStore extends FluxStore {
 
     @Inject
@@ -103,7 +108,74 @@ class AppStore extends FluxStore {
 	//Do some work or business logic update state variables
 	emitReaction(SOME_REACTION_TYPE);
     }
+    
+    @Action(actionType = SOME_ACTION_TYPE)
+    public void someMethod(FluxAction action) {
+	//Do some work or business logic update state variables or pass data to view to update itself
+	emitReaction(SOME_REACTION_TYPE,Keys.SOME_KEY,action.get(Keys.SOME_KEY));
+    }
 }
+```
+##More Examples
+
+```java
+public class DummyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+	@Inject ActionsCreator actionsCreator;
+	private List<Object> mObjectList;
+
+	public DummyAdapter(List<Object> list) {
+		App.getInstance().geteComponent().inject(this);
+		this.mObjectList = list;
+		Flux.getInstance().registerReactionSubscriber(this)
+	}
+	
+	public class DummyViewHolder extends RecyclerView.ViewHolder {
+		@BindView(R.id.horizontalList)RecyclerView recyclerView;
+
+		public DummyViewHolder(View view) {
+			super(view);
+			ButterKnife.bind(this, view);
+		}
+	}
+	
+	@Override
+	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		return new DummyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.user_query_item, parent, false));
+	}
+
+	@Override
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+		final Object object = mObjectList.get(position);
+	}
+
+	@Override
+	public int getItemCount() {
+		return mAiObjectList.size();
+	}
+
+	@React(reactionType = ADD_ITEM)
+	public void add(Reaction reaction){
+		mObjectList.add(reaction.get(Keys.ITEM);
+		notifyDataSetChanged();
+	}
+	
+	@React(reactionType = UPDATE_ITEM)
+	public void add(Reaction reaction){
+		mObjectList.set(((Integer)reaction.get(Keys.POSITION)).intValue(), reaction.get(Keys.ITEM));
+		notifyItemChanged(((Integer)reaction.get(Keys.POSITION)).intValue())
+	}
+	
+	@React(reactionType = DELETE_ITEM)
+	public void add(Reaction reaction){
+		mObjectList.remove(((Integer)reaction.get(Keys.POSITION)).intValue());
+		notifyItemRemoved(((Integer)reaction.get(Keys.POSITION)).intValue());
+	}
+}
+
+
+```
+
+
 
 ## Bugs and Feedback
 
