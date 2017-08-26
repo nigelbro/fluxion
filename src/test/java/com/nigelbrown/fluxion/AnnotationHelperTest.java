@@ -24,6 +24,6 @@ public class AnnotationHelperTest {
 	@Test
 	public void callMethodsWithActionAnnotation() throws Exception {
 		Set<Method> methods = AnnotationHelper.getMethodsAnnotatedWithAction();
-		Assert.assertEquals(methods.size(),1);
+		Assert.assertEquals(methods.size(),0);
 	}
 }
