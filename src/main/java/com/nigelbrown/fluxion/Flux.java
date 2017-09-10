@@ -78,6 +78,7 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 
 			@Override
 			public void onFragmentDetached(FragmentManager fragmentManager, Fragment fragment) {
+				REACT_CACHE.remove(fragment);
 				super.onFragmentDetached(fragmentManager, fragment);
 			}
 		}, true);
@@ -105,6 +106,7 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 
 	@Override
 	public void onActivityDestroyed(Activity activity) {
+		REACT_CACHE.remove(activity);
 	}
 
 	void registerActionSubscriber(Object storeClass) {
@@ -165,6 +167,12 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 				e.onComplete();
 			}
 		});
+	}
+
+	public void unregesterReactionSubscriber(Object view){
+		if(REACT_CACHE.containsKey(view)){
+			REACT_CACHE.remove(view);
+		}
 	}
 
 	private class MethodsWithActionAnnotationHelperRunnable implements Runnable {
