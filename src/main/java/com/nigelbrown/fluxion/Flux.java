@@ -175,11 +175,6 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 		}
 	}
 
-	public void unregisterAllSubscribers(){
-		REACT_CACHE.clear();
-		ACTIONS_CACHE.clear();
-	}
-
 	private class MethodsWithActionAnnotationHelperRunnable implements Runnable {
 		private Object parentClass;
 
