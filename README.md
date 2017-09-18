@@ -39,7 +39,7 @@ allprojects {
 Add the dependency:
 ```gradle
 dependencies {
-	compile 'com.github.nigelbro:fluxion:v2.1'
+	compile 'com.github.nigelbro:fluxion:v2.2'
 }
 ```
 
