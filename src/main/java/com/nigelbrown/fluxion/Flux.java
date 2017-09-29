@@ -7,11 +7,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 
 import com.nigelbrown.fluxion.Annotation.Action;
+import com.nigelbrown.fluxion.Annotation.FluxRecyclerView;
 import com.nigelbrown.fluxion.Annotation.React;
 import com.nigelbrown.fluxion.Annotation.Store;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,23 +66,31 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 	@Override
 	public void onActivityCreated(Activity activity, Bundle bundle) {
 		registerReactionSubscriber(activity);
+		final ExecutorService activityExecutor = Executors.newFixedThreadPool(1);
+		activityExecutor.execute(new RecyclerViewInstance(activity));
 		((AppCompatActivity)activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
 			@Override
 			public void onFragmentAttached(FragmentManager fragmentManager, final Fragment fragment, Context context) {
 				super.onFragmentAttached(fragmentManager, fragment, context);
-				final ExecutorService classExecutor = Executors.newFixedThreadPool(1);
-				classExecutor.execute(new Thread(new Runnable() {
-					@Override
-					public void run() {
-						registerReactionSubscriber(fragment);
-					}
-				}));
+				registerComponentAndAllMembers(fragment);
 			}
 
 			@Override
-			public void onFragmentDetached(FragmentManager fragmentManager, Fragment fragment) {
-				REACT_CACHE.remove(fragment);
+			public void onFragmentDetached(FragmentManager fragmentManager,final Fragment fragment) {
+				unregisterFragmentAndAllMembers(fragment);
 				super.onFragmentDetached(fragmentManager, fragment);
+			}
+
+			@Override
+			public void onFragmentResumed(FragmentManager fragmentManager,final Fragment fragment) {
+				super.onFragmentResumed(fragmentManager, fragment);
+				registerComponentAndAllMembers(fragment);
+			}
+
+			@Override
+			public void onFragmentPaused(FragmentManager fragmentManager, Fragment fragment) {
+				unregisterFragmentAndAllMembers(fragment);
+				super.onFragmentPaused(fragmentManager, fragment);
 			}
 		}, true);
 	}
@@ -149,6 +160,41 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 		});
 	}
 
+	private void unregisterFragmentAndAllMembers(final Object parentClass){
+		REACT_CACHE.remove(parentClass);
+		final ExecutorService classExecutor = Executors.newFixedThreadPool(1);
+		classExecutor.execute(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Field[] classMemberFields = parentClass.getClass().getDeclaredFields();
+				for (Field field: classMemberFields) {
+					if(field.getAnnotation(FluxRecyclerView.class) != null ) {
+						REACT_CACHE.remove(field);
+					}
+				}
+			}
+		}));
+	}
+
+	private void registerComponentAndAllMembers(final Object parentClass){
+		final ExecutorService classExecutor = Executors.newFixedThreadPool(1);
+		classExecutor.execute(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				registerReactionSubscriber(parentClass);
+				Field[] classMemberFields = parentClass.getClass().getDeclaredFields();
+				for (Field field: classMemberFields) {
+					if(field.getAnnotation(FluxRecyclerView.class) != null ) {
+						Class<?> classType = field.getType();
+						if(RecyclerView.Adapter.class.isAssignableFrom(classType)){
+							registerReactionSubscriber(field);
+						}
+					}
+				}
+			}
+		}));
+	}
+
 	Observable emitReaction(final Reaction reaction) {
 		return Observable.just(reaction).create(new ObservableOnSubscribe() {
 			@Override
@@ -192,6 +238,27 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 					}
 				}
 				ACTIONS_CACHE.put(parentClass, classMethods);
+			}
+		}
+	}
+
+	private class RecyclerViewInstance implements Runnable {
+		private Object mParentClass;
+
+		public RecyclerViewInstance(Object viewClass) {
+			this.mParentClass = viewClass;
+		}
+
+		@Override
+		public void run() {
+			Field[] classMemberFields = mParentClass.getClass().getDeclaredFields();
+			for (Field field: classMemberFields) {
+				if(field.getAnnotation(FluxRecyclerView.class) != null ) {
+					Class<?> classType = field.getType();
+					if(RecyclerView.Adapter.class.isAssignableFrom(classType)){
+						registerReactionSubscriber(field);
+					}
+				}
 			}
 		}
 	}

@@ -1,6 +1,5 @@
 package com.nigelbrown.fluxion;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -59,6 +58,7 @@ public abstract class FluxActionCreator {
 				HashMap<String,Object> map = (HashMap<String, Object>)o;
 				Method method = (Method)map.get(METHOD);
 				FluxAction action = (FluxAction)map.get(Flux.ACTION);
+				method.setAccessible(true);
 				try {
 					method.invoke(map.get(Flux.CLASS),action);
 				}catch(Exception e){
