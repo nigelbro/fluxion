@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
  * Created by Nigel.Brown on 9/29/2017.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.LOCAL_VARIABLE)
+@Target(ElementType.FIELD)
 public @interface FluxRecyclerView {}
