@@ -184,7 +184,7 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 				registerReactionSubscriber(parentClass);
 				Field[] classMemberFields = parentClass.getClass().getDeclaredFields();
 				for (Object field: classMemberFields) {
-					if(field.getClass().getAnnotation(FluxRecyclerView.class) != null ) {
+					if(((Field)field).getAnnotation(FluxRecyclerView.class) != null ) {
 						Object instance = field.getClass().getClass();
 						if(RecyclerView.Adapter.class.isAssignableFrom(field.getClass().getClass())){
 							registerReactionSubscriber(field);
