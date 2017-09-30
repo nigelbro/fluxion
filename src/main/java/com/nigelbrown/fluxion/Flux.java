@@ -187,6 +187,12 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 		});
 	}
 
+	public void unregesterReactionSubscriber(Object view){
+		if(REACT_CACHE.containsKey(view)){
+			REACT_CACHE.remove(view);
+		}
+	}
+
 	private class MethodsWithActionAnnotationHelperRunnable implements Runnable {
 		private Object parentClass;
 
