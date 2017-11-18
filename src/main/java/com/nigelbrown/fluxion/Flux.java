@@ -5,8 +5,9 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+
 
 import com.nigelbrown.fluxion.Annotation.Action;
 import com.nigelbrown.fluxion.Annotation.React;
@@ -63,7 +64,7 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 	@Override
 	public void onActivityCreated(Activity activity, Bundle bundle) {
 		registerReactionSubscriber(activity);
-		((AppCompatActivity)activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+		((FragmentActivity)activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
 			@Override
 			public void onFragmentAttached(FragmentManager fragmentManager, final Fragment fragment, Context context) {
 				super.onFragmentAttached(fragmentManager, fragment, context);
