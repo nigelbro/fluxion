@@ -63,6 +63,9 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 
 	@Override
 	public void onActivityCreated(Activity activity, Bundle bundle) {
+		if(!(activity instanceof  FragmentActivity)){
+			return;
+		}
 		registerReactionSubscriber(activity);
 		((FragmentActivity)activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
 			@Override
