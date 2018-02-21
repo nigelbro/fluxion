@@ -23,7 +23,6 @@ public class App extends android.app.Application {
 		component = DaggerAppComponent.builder().applicationModule(new ApplicationModule(this)).actionsCreatorModule(new ActionsCreatorModule()).storeModule(new StoreModule()).build();
 
 	}
-
 	public AppComponent getComponent() {
 		return component;
 	}

@@ -10,7 +10,6 @@ import javax.inject.Inject;
  * Created by Nigel.Brown on 8/22/2017.
  */
 public class ActionCreator extends FluxActionCreator implements Actions {
-
 	@Inject
 	public ActionCreator(Flux flux) {
 		super(flux);

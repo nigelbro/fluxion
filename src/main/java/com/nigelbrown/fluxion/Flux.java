@@ -5,8 +5,9 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+
 
 import com.nigelbrown.fluxion.Annotation.Action;
 import com.nigelbrown.fluxion.Annotation.React;
@@ -62,8 +63,11 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 
 	@Override
 	public void onActivityCreated(Activity activity, Bundle bundle) {
+		if(!(activity instanceof  FragmentActivity)){
+			return;
+		}
 		registerReactionSubscriber(activity);
-		((AppCompatActivity)activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+		((FragmentActivity)activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
 			@Override
 			public void onFragmentAttached(FragmentManager fragmentManager, final Fragment fragment, Context context) {
 				super.onFragmentAttached(fragmentManager, fragment, context);
@@ -80,6 +84,24 @@ public class Flux implements Application.ActivityLifecycleCallbacks {
 			public void onFragmentDetached(FragmentManager fragmentManager, Fragment fragment) {
 				REACT_CACHE.remove(fragment);
 				super.onFragmentDetached(fragmentManager, fragment);
+			}
+
+			@Override
+			public void onFragmentResumed(FragmentManager fragmentManager,final Fragment fragment) {
+				super.onFragmentResumed(fragmentManager, fragment);
+				final ExecutorService classExecutor = Executors.newFixedThreadPool(1);
+				classExecutor.execute(new Thread(new Runnable() {
+					@Override
+					public void run() {
+						registerReactionSubscriber(fragment);
+					}
+				}));
+			}
+
+			@Override
+			public void onFragmentPaused(FragmentManager fragmentManager, Fragment fragment) {
+				REACT_CACHE.remove(fragment);
+				super.onFragmentPaused(fragmentManager, fragment);
 			}
 		}, true);
 	}
