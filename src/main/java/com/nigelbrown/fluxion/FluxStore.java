@@ -70,6 +70,7 @@ public abstract class FluxStore {
 				HashMap<String, Object> map = (HashMap<String, Object>)o;
 				Method method = (Method)map.get(METHOD);
 				Reaction reaction = (Reaction)map.get(Flux.REACTION);
+				method.setAccessible(true);
 				try {
 					method.invoke(map.get(Flux.CLASS), reaction);
 				}catch(Exception e) {

@@ -38,14 +38,13 @@ public class MathStore extends FluxStore {
 	@Inject
 	public MathStore(Flux flux) {
 		super(flux);
-		registerActionSubscriber(MathStore.this);
+		registerActionSubscriber(this);
 		buildAnswerKey();
 	}
 
 	@Action(actionType = START_QUIZ)
 	public void startQuiz(FluxAction action) {
 		List<String> equationList = getEquationList();
-		emitReaction(SHOW_FIRST_PROBLEM, Keys.EQUATION, equationList.get(currentPosition));
 		emitReaction(SHOW_FIRST_PROBLEM, Keys.EQUATION, equationList.get(currentPosition));
 	}
 
@@ -112,5 +111,4 @@ public class MathStore extends FluxStore {
 		}
 		return String.valueOf(total);
 	}
-
 }
