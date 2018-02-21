@@ -39,7 +39,7 @@ allprojects {
 Add the dependency:
 ```gradle
 dependencies {
-	compile 'com.github.nigelbro:fluxion:v2.2'
+	compile 'com.github.nigelbro:fluxion:v2.3'
 }
 ```
 
@@ -100,7 +100,7 @@ class AppStore extends FluxStore {
     @Inject
     public MathStore(Flux flux) {
 	super(flux);
-	registerActionSubscriber(MathStore.this);
+	registerActionSubscriber(this);
     }
     
     @Action(actionType = SOME_ACTION_TYPE)
